@@ -11,7 +11,7 @@
     />
 </head>
 <body>
-<div class="col-8">
+<div class="col-5">
     <div class="container">
         <div class="card">
             <div class="card-header bg-primary text-white text-center">
@@ -52,14 +52,6 @@
                         </div>
                     </div>
                     <br/>
-                    <div class="row">
-                        <div class="col-2">
-                            <label>Current Image</label>
-                        </div>
-                        <div class="col-4">
-                            <img th:src="@{'/uploads/' + ${invoice.imageName}}" alt="Invoice Image" class="img-thumbnail" />
-                        </div>
-                    </div><br/>
                     <button type="submit" class="btn btn-success">Update <i class="fa fa-wrench" aria-hidden="true"></i></button>
                     <a th:href="@{/invoice/getAllInvoices}" class= "btn btn-primary">Show All Invoices</a>
                 </form>

@@ -1,16 +1,12 @@
 package org.example.service.impl;
 
-import org.example.exeptions.InvoiceNotFoundException;
+import org.example.exceptions.InvoiceNotFoundException;
 import org.example.model.Invoice;
 import org.example.repo.InvoiceRepository;
 import org.example.service.IInvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,24 +38,8 @@ public class InvoiceServiceImpl implements IInvoiceService {
 
     @Override
     public void deleteInvoiceById(Long id) {
-        Invoice invoice = getInvoiceById(id); // Отримуємо рахунок за ідентифікатором
-
-        // Видаляємо файл з файлової системи
-        deleteFile(invoice.getImageName());
-
-        // Видаляємо рахунок з бази даних
-        repo.delete(invoice);
+        repo.delete(getInvoiceById(id));
     }
-
-    private void deleteFile(String imageName) {
-        try {
-            Path filePath = Paths.get("uploads", imageName); // Створюємо шлях до файлу
-            Files.deleteIfExists(filePath); // Видаляємо файл, якщо він існує
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to delete file: " + imageName, e);
-        }
-    }
-
 
     @Override
     public void updateInvoice(Invoice invoice) {

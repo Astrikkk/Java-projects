@@ -1,10 +1,7 @@
-package org.example.exeptions;
-
-import java.io.Serial;
+package org.example.exceptions;
 
 public class InvoiceNotFoundException extends RuntimeException {
 
-    @Serial
     private static final long serialVersionUID = 1L;
 
     public InvoiceNotFoundException() {
