@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org/">
 <head>
     <link rel="stylesheet"
@@ -22,7 +23,8 @@
                         <th>Name</th>
                         <th>Location</th>
                         <th>Amount</th>
-                        <th>Photo</th>
+                        <th>Image Name</th>
+                        <th>Image</th>
                         <th>Edit/Delete</th>
                     </tr>
                     <tr th:each="ob:${list}">
@@ -30,18 +32,23 @@
                         <td th:text=${ob.name}></td>
                         <td th:text=${ob.location}></td>
                         <td th:text=${ob.amount}></td>
-                        <td th:href="${file}" th:text="${file}" ></td>
-                        <td><a th:href="@{/invoice/delete(id=${ob.id})}" class= "btn btn-danger">DELETE <i class="fa fa-trash-o" aria-hidden="true"></i></a> |
-                            <a th:href="@{/invoice/edit(id=${ob.id})}" class="btn btn-warning">EDIT <i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></td>
+                        <td>
+                            <img th:src="@{'/uploads/' + ${ob.imageName}}" alt="Invoice Image" class="img-thumbnail" />
+                        </td>
+                        <td>
+                            <a th:href="@{/invoice/delete(id=${ob.id})}" class="btn btn-danger">DELETE <i class="fa fa-trash-o" aria-hidden="true"></i></a> |
+                            <a th:href="@{/invoice/edit(id=${ob.id})}" class="btn btn-warning">EDIT <i class="fa fa-pencil-square-o" aria-hidden="true"></i></a>
+                        </td>
                     </tr>
                 </table>
-                <a th:href="@{/invoice/register}" class= "btn btn-success ">Add Invoice <i class="fa fa-plus-square" aria-hidden="true"></i></a>
-                <a th:href="@{/invoice/}" class= "btn btn-primary">Go to Home</a>
+                <a th:href="@{/invoice/register}" class="btn btn-success">Add Invoice <i class="fa fa-plus-square" aria-hidden="true"></i></a>
+                <a th:href="@{/invoice/}" class="btn btn-primary">Go to Home</a>
             </div>
             <div class="card-footer bg-white text-success" th:if="${message!=null}">
                 <span th:text="${message}"></span>
             </div>
         </div>
-    </div></div>
+    </div>
+</div>
 </body>
 </html>

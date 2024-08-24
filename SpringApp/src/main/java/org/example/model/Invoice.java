@@ -1,13 +1,10 @@
 package org.example.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 @Entity
 @Data
@@ -21,6 +18,9 @@ public class Invoice {
     private String name;
     private String location;
     private Double amount;
-    @Lob // Large Object annotation to handle large data like images
-    private byte[] photo;
+    @Column(name = "image_name", length = 255)
+    private String imageName;
+    @Transient
+    private MultipartFile imageFile;
+
 }
