@@ -1,9 +1,11 @@
 package org.example.service.impl;
 
+import org.example.dto.invoice.InvoiceCreateDTO;
 import org.example.exceptions.InvoiceNotFoundException;
 import org.example.model.Invoice;
 import org.example.repo.InvoiceRepository;
 import org.example.service.IInvoiceService;
+import org.example.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +18,23 @@ public class InvoiceServiceImpl implements IInvoiceService {
     @Autowired
     private InvoiceRepository repo;
 
+    @Autowired
+    private StorageService storageService;
+
     @Override
-    public Invoice saveInvice(Invoice invoice) {
-        return repo.save(invoice);
+    public Invoice saveInvoice(InvoiceCreateDTO dto) {
+        try {
+            Invoice invoice = new Invoice();
+            invoice.setName(dto.getName());
+            invoice.setAmount(dto.getAmount());
+            var imageName = storageService.save(dto.getFile());
+            invoice.setFileName(imageName);
+            invoice.setLocation(dto.getLocation());
+            return repo.save(invoice);
+        }
+        catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override

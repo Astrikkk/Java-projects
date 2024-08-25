@@ -1,25 +1,19 @@
-package org.example.model;
+package org.example.dto.invoice;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
-@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Invoice {
-
-    @Id
-    @GeneratedValue
+public class InvoiceCreateDTO {
     private Long id;
     private String name;
     private String location;
+    private MultipartFile file;
     private Double amount;
-    private String fileName;
 }
