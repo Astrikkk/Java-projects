@@ -38,10 +38,25 @@ public class FileSystemStorageService implements StorageService {
         return randomFileName;
     }
 
+    @Override
+    public void delete(String filename) {
+        Path file = this.rootLocation.resolve(filename);
+        try {
+            Files.deleteIfExists(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public Path getRootLocation() {
+        return this.rootLocation;
+    }
+
     private String getFileExtension(MultipartFile file) {
         String originFilename = file.getOriginalFilename();
-        if(originFilename!=null && originFilename.contains(".")) {
-            return originFilename.substring(originFilename.lastIndexOf(".")+1);
+        if (originFilename != null && originFilename.contains(".")) {
+            return originFilename.substring(originFilename.lastIndexOf(".") + 1);
         }
         return "";
     }

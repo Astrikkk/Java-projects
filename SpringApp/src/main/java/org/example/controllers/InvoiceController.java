@@ -4,20 +4,39 @@ import org.example.dto.invoice.InvoiceCreateDTO;
 import org.example.exceptions.InvoiceNotFoundException;
 import org.example.model.Invoice;
 import org.example.service.IInvoiceService;
+import org.example.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
+
 
 @Controller
 @RequestMapping("/invoice")
 public class InvoiceController {
 
+    private static final String UPLOAD_DIR = "uploading/";
+
     @Autowired
     private IInvoiceService service;
+
+    @Autowired
+    private StorageService storageService;
 
     @GetMapping("/")
     public String showHomePage() {
@@ -60,27 +79,66 @@ public class InvoiceController {
             RedirectAttributes attributes,
             @RequestParam Long id
     ) {
-        String page = null;
+        String page;
         try {
             Invoice invoice = service.getInvoiceById(id);
-            model.addAttribute("invoice", invoice);
-            page="editInvoicePage";
+            InvoiceCreateDTO dto = new InvoiceCreateDTO();
+            dto.setId(invoice.getId());
+            dto.setName(invoice.getName());
+            dto.setLocation(invoice.getLocation());
+            dto.setAmount(invoice.getAmount());
+
+            model.addAttribute("invoice", dto);
+            page = "editInvoicePage";
         } catch (InvoiceNotFoundException e) {
             e.printStackTrace();
             attributes.addAttribute("message", e.getMessage());
-            page="redirect:getAllInvoices";
+            page = "redirect:getAllInvoices";
         }
         return page;
     }
 
     @PostMapping("/update")
     public String updateInvoice(
-            @ModelAttribute Invoice invoice,
+            @ModelAttribute InvoiceCreateDTO dto,
+            @RequestParam("file") MultipartFile file,
             RedirectAttributes attributes
     ) {
-        service.updateInvoice(invoice);
-        Long id = invoice.getId();
-        attributes.addAttribute("message", "Invoice with id: '"+id+"' is updated successfully !");
+        try {
+            // Fetch the existing invoice
+            Invoice existingInvoice = service.getInvoiceById(dto.getId());
+
+            // Update basic fields
+            existingInvoice.setName(dto.getName());
+            existingInvoice.setLocation(dto.getLocation());
+            existingInvoice.setAmount(dto.getAmount());
+
+            // Handle file upload
+            if (file != null && !file.isEmpty()) {
+                // Delete the old file if it exists
+                String oldFileName = existingInvoice.getFileName();
+                if (oldFileName != null && !oldFileName.isEmpty()) {
+                    storageService.delete(oldFileName); // Delete the old file
+                }
+
+                // Save the new file and update the filename
+                String newFileName = storageService.save(file);
+                existingInvoice.setFileName(newFileName);
+            }
+
+            // Update the invoice in the database
+            service.updateInvoice(existingInvoice);
+
+            Long id = existingInvoice.getId();
+            attributes.addAttribute("message", "Invoice with id: '" + id + "' is updated successfully!");
+        } catch (InvoiceNotFoundException e) {
+            e.printStackTrace();
+            attributes.addAttribute("message", e.getMessage());
+        } catch (IOException e) {
+            e.printStackTrace();
+            attributes.addAttribute("message", "Error saving file. Please try again.");
+        }
+
         return "redirect:getAllInvoices";
     }
 
@@ -98,4 +156,25 @@ public class InvoiceController {
         }
         return "redirect:getAllInvoices";
     }
+
+
+    @GetMapping("/download")
+    public ResponseEntity<Resource> downloadFile(@RequestParam("filename") String filename) {
+        try {
+            Path file = Paths.get(storageService.getRootLocation().toString()).resolve(filename).normalize();
+            Resource resource = new UrlResource(file.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                return ResponseEntity.ok()
+                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                        .body(resource);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
 }
