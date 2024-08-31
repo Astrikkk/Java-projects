@@ -54,7 +54,12 @@ public class InvoiceServiceImpl implements IInvoiceService {
 
     @Override
     public void deleteInvoiceById(Long id) {
-        repo.delete(getInvoiceById(id));
+        Invoice invoice = getInvoiceById(id); // Fetch the invoice
+        // Delete the associated photo
+        if (invoice.getFileName() != null) {
+            storageService.delete(invoice.getFileName());
+        }
+        repo.delete(invoice); // Delete the invoice
     }
 
     @Override
