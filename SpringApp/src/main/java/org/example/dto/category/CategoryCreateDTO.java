@@ -6,6 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 public class CategoryCreateDTO {
     private String name;
-    private MultipartFile file;
+    private MultipartFile image;
     private String description;
 }
