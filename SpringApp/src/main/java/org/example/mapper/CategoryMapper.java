@@ -6,9 +6,13 @@ import org.example.model.CategoryEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
     @Mapping(target = "image", ignore = true)
-    CategoryItemDTO categoryItemDTO(CategoryEntity entity);
     CategoryEntity categoryEntityByCategoryCreateDTO(CategoryCreateDTO category);
+
+    CategoryItemDTO toDto(CategoryEntity category);
+    List<CategoryItemDTO> toDto(List<CategoryEntity> category);
 }

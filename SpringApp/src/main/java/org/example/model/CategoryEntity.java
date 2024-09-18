@@ -1,12 +1,17 @@
 package org.example.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name="tbl_categories")
 public class CategoryEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,4 +28,7 @@ public class CategoryEntity {
 
     @Column(name="date_created")
     private LocalDateTime creationTime;
+
+    @OneToMany(mappedBy = "category",cascade = CascadeType.ALL)
+    private List<ProductEntity> products;
 }

@@ -9,7 +9,9 @@ import java.nio.file.Path;
 public interface StorageService {
     void init() throws IOException;
     String save(MultipartFile file) throws IOException;
+    String saveImage(MultipartFile file, FileSaveFormat format) throws IOException;
+    String saveImage(String fileUrl, FileSaveFormat format) throws IOException;
     void delete(String filename);
     Path getRootLocation();
-    String saveImage(MultipartFile file, FileSaveFormat format) throws IOException;
+    void deleteImage(String filename) throws IOException;
 }
